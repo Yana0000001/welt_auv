@@ -61,7 +61,7 @@ services:
       - debug
     restart: no
     
-    usb_cameras:
+      usb_cameras:
     image: ros:humble-ros-base
     container_name: s_usb_cameras
     ipc: host
@@ -71,4 +71,7 @@ services:
       - /dev:/dev
       - ${HOME}/welt:/welt
     command: ros2 launch welt_launch cam.launch.py enable_front_camera:=true enable_bottom_camera:=true
+    profiles:
+      - vision
     restart: unless-stopped
+
