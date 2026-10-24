@@ -50,7 +50,7 @@ services:
       - debug
       - visualize
 
-    recorder:
+  recorder:
     image: ros:humble-ros-base
     container_name: s_recorder
     ipc: host
