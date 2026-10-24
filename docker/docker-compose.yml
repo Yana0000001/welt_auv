@@ -79,7 +79,9 @@ services:
     network_mode: host
     privileged: true
     volumes:
-      - /dev:/dev
+      # Пробрасываем строго конкретные физические устройства по их устойчивым путям
+      - /dev/v4l/by-path/platform-3610000.usb-usb-0:2.4:1.0-video-index0:/dev/v4l/by-path/platform-3610000.usb-usb-0:2.4:1.0-video-index0
+      - /dev/v4l/by-id/usb-Microsoft_Microsoft®_LifeCam_HD-3000-video-index0:/dev/v4l/by-id/usb-Microsoft_Microsoft®_LifeCam_HD-3000-video-index0
       - ${HOME}/welt:/welt
     command: ros2 launch welt_launch cam.launch.py enable_front_camera:=true enable_bottom_camera:=true
     profiles:
