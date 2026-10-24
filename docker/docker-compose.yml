@@ -54,13 +54,24 @@ services:
     image: ros:humble-ros-base
     container_name: s_recorder
     ipc: host
+    network_mode: host
     volumes:
       - ${HOME}/rosbags:/rosbags
-    command: timeout 300 ros2 bag record -o /rosbags/rosbag_$(date +%d-%m-%y__%H-%M") --compression-mode file --compression-format zstd -a
+    # Записываем топики фронтальной и нижней камер (изображения и информацию)
+    command: >
+      timeout 300 ros2 bag record 
+      -o /rosbags/rosbag_$(date +%d-%m-%y__%H-%M) 
+      --compression-mode file 
+      --compression-format zstd 
+      /stingray/topics/camera/front 
+      /stingray/topics/camera/front/camera_info 
+      /stingray/topics/camera/bottom 
+      /stingray/topics/camera/bottom/camera_info
     profiles:
       - debug
+      - vision
     restart: no
-    
+
   usb_cameras:
     image: ros:humble-ros-base
     container_name: s_usb_cameras
