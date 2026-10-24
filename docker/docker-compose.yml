@@ -55,15 +55,18 @@ services:
     container_name: s_recorder
     ipc: host
     network_mode: host
-    init: true # Гарантирует корректный проброс SIGINT/SIGTERM для предотвращения порчи bag-файла
+    init: true
     volumes:
       - ${HOME}/rosbags:/rosbags
-    # Запись минимального набора топиков, разбиение файлов по 500 МБ и контроль свободного места
+      # Монтируем файл настроек QoS внутрь контейнера
+      - ./qos_override.yaml:/qos_override.yaml
+    # Запуск записи с явным указанием оверрайда QoS для надежного захвата потоков
     command: >
       bash -c '
-      mkdir -p /rosbags/$(date +%Y-%m-%d_%H-%M-%S) && 
+      mkdir -p /rosbags/$$(date +%Y-%m-%d_%H-%M-%S) && 
       ros2 bag record 
-      -o /rosbags/$(date +%Y-%m-%d_%H-%M-%S)/session 
+      -o /rosbags/$$(date +%Y-%m-%d_%H-%M-%S)/session 
+      --qos-profile-overrides-path /qos_override.yaml
       --compression-mode file 
       --compression-format zstd 
       --max-bag-size 524288000 
@@ -77,6 +80,7 @@ services:
       - debug
       - vision
     restart: no
+
 
   usb_cameras:
     image: ros:humble-ros-base
