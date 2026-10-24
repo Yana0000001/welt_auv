@@ -57,7 +57,7 @@ services:
     network_mode: host
     volumes:
       - ${HOME}/rosbags:/rosbags
-    # Записываем топики фронтальной и нижней камер (изображения и информацию)
+    # Минимальный набор данных: потоки камер, калибровки и дерево трансформаций TF
     command: >
       timeout 300 ros2 bag record 
       -o /rosbags/rosbag_$(date +%d-%m-%y__%H-%M) 
@@ -67,10 +67,13 @@ services:
       /stingray/topics/camera/front/camera_info 
       /stingray/topics/camera/bottom 
       /stingray/topics/camera/bottom/camera_info
+      /tf
+      /tf_static
     profiles:
       - debug
       - vision
     restart: no
+
 
   usb_cameras:
     image: ros:humble-ros-base
