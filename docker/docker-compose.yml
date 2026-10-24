@@ -61,7 +61,7 @@ services:
       - debug
     restart: no
     
-      usb_cameras:
+  usb_cameras:
     image: ros:humble-ros-base
     container_name: s_usb_cameras
     ipc: host
