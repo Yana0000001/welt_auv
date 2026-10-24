@@ -57,10 +57,10 @@ services:
     network_mode: host
     volumes:
       - ${HOME}/rosbags:/rosbags
-    # Минимальный набор данных: потоки камер, калибровки и дерево трансформаций TF
+    # Уникальное имя сессии по формату ГГГГ-ММ-ДД_ЧЧ-ММ-СС, исключающее перезапись данных
     command: >
       timeout 300 ros2 bag record 
-      -o /rosbags/rosbag_$(date +%d-%m-%y__%H-%M) 
+      -o /rosbags/$(date +%Y-%m-%d_%H-%M-%S) 
       --compression-mode file 
       --compression-format zstd 
       /stingray/topics/camera/front 
@@ -73,6 +73,7 @@ services:
       - debug
       - vision
     restart: no
+
 
 
   usb_cameras:
