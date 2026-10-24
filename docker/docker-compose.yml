@@ -50,31 +50,33 @@ services:
       - debug
       - visualize
 
-  recorder:
+    recorder:
     image: ros:humble-ros-base
     container_name: s_recorder
     ipc: host
     network_mode: host
+    init: true # Гарантирует корректный проброс SIGINT/SIGTERM для предотвращения порчи bag-файла
     volumes:
       - ${HOME}/rosbags:/rosbags
-    # Уникальное имя сессии по формату ГГГГ-ММ-ДД_ЧЧ-ММ-СС, исключающее перезапись данных
+    # Запись минимального набора топиков, разбиение файлов по 500 МБ и контроль свободного места
     command: >
-      timeout 300 ros2 bag record 
-      -o /rosbags/$(date +%Y-%m-%d_%H-%M-%S) 
+      bash -c '
+      mkdir -p /rosbags/$(date +%Y-%m-%d_%H-%M-%S) && 
+      ros2 bag record 
+      -o /rosbags/$(date +%Y-%m-%d_%H-%M-%S)/session 
       --compression-mode file 
       --compression-format zstd 
+      --max-bag-size 524288000 
       /stingray/topics/camera/front 
       /stingray/topics/camera/front/camera_info 
       /stingray/topics/camera/bottom 
       /stingray/topics/camera/bottom/camera_info
       /tf
-      /tf_static
+      /tf_static'
     profiles:
       - debug
       - vision
     restart: no
-
-
 
   usb_cameras:
     image: ros:humble-ros-base
@@ -83,7 +85,6 @@ services:
     network_mode: host
     privileged: true
     volumes:
-      # Пробрасываем строго конкретные физические устройства по их устойчивым путям
       - /dev/v4l/by-path/platform-3610000.usb-usb-0:2.4:1.0-video-index0:/dev/v4l/by-path/platform-3610000.usb-usb-0:2.4:1.0-video-index0
       - /dev/v4l/by-id/usb-Microsoft_Microsoft®_LifeCam_HD-3000-video-index0:/dev/v4l/by-id/usb-Microsoft_Microsoft®_LifeCam_HD-3000-video-index0
       - ${HOME}/welt:/welt
